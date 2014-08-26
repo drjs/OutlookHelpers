@@ -1,4 +1,3 @@
-Attribute VB_Name = "BulkDeleteAppointments"
 '' Copyright (c) 2014 by Joachim Schlosser
 ' http://www.schlosser.info
 '
