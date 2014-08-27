@@ -24,7 +24,9 @@
 ' OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ' OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '
-
+' Description of functionality at  http://www.schlosser.info/outlook-delete-multiple-appointments
+' Beschreibung der Funktionalität: http://www.schlosser.info/outlook-viele-termine-absagen
+'
 Private Type dateRange
     startDate As Date
     endDate As Date
@@ -116,13 +118,8 @@ Private Function selectFromDateRange(datRange As dateRange) As Outlook.Items
     If oItemsInDateRange.Count > 0 Then
         Set selectFromDateRange = oItemsInDateRange
     End If
-'    For Each oAppt In oItemsInDateRange
-'        Debug.Print oAppt.Start, oAppt.Subject
-'        Application.ActiveExplorer.AddToSelection oAppt
-'        oReturnItems.Item oAppt
-'    Next
-'    selectFromDateRange = oReturnItems
 End Function
+
 ' The core function for bulk delete
 Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
     Dim strMessageClass As String
