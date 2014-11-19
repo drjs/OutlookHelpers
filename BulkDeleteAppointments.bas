@@ -1,3 +1,4 @@
+Attribute VB_Name = "Module1"
 '' Copyright (c) 2014 by Joachim Schlosser
 ' http://www.schlosser.info
 '
@@ -37,16 +38,16 @@ End Type
 ' Delete all selected calendar items and send the same message on all
 Public Sub BulkDeleteAppointments()
     Dim oAppt As Object
-    Dim itemsToDelete As Outlook.Items
+    Dim itemsToDelete As Object
     Dim cancelMsg As String
     Dim datRange As dateRange
     ' did user select date range or individual items?
     datRange = selectedDateRange()
-    If (datRange.startDate <> datRange.datNull) And (datRange.endDate <> datRange.datNull) Then
+    If Application.ActiveExplorer.Selection.Count > 0 Then
+        Set itemsToDelete = Application.ActiveExplorer.Selection
+    ElseIf (datRange.startDate <> datRange.datNull) And (datRange.endDate <> datRange.datNull) Then
         ' auto-select all calendar items in range
         Set itemsToDelete = selectFromDateRange(datRange)
-    ElseIf Application.ActiveExplorer.Selection.Count > 0 Then
-        itemsToDelete = ActiveExplorer.Selection
     End If
     ' only proceed if items are selected by now, either automatically or manually
     If itemsToDelete.Count > 0 Then
