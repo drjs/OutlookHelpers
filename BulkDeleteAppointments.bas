@@ -1,4 +1,3 @@
-Attribute VB_Name = "Module1"
 '' Copyright (c) 2014 by Joachim Schlosser
 ' http://www.schlosser.info
 '
@@ -26,7 +25,7 @@ Attribute VB_Name = "Module1"
 ' OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '
 ' Description of functionality at  http://www.schlosser.info/outlook-delete-multiple-appointments
-' Beschreibung der Funktionalit‰t: http://www.schlosser.info/outlook-viele-termine-absagen
+' Beschreibung der Funktionalit√§t: http://www.schlosser.info/outlook-viele-termine-absagen
 '
 Private Type dateRange
     startDate As Date
