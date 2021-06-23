@@ -135,8 +135,10 @@ Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
             oAppointItem.Send
         Else                                            ' If I was invited to this meeting
             Set myMtg = oAppointItem.Respond(olMeetingDeclined, True, False)
-            myMtg.Body = cancelMsg
-            myMtg.Send
+            If Not myMtg Is Nothing Then
+                myMtg.Body = cancelMsg
+                myMtg.Send
+            End If
         End If
     End If
 End Sub
