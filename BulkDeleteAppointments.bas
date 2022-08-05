@@ -1,5 +1,5 @@
-'' Copyright (c) 2014 by Joachim Schlosser
-' http://www.schlosser.info
+'' Copyright (c) 2014-2022 by Joachim Schlosser with major improvements by Klaus Jandl
+' https://www.schlosser.info
 '
 ' All rights reserved.
 '
