@@ -40,23 +40,36 @@ Public Sub BulkDeleteAppointments()
     Dim itemsToDelete As Object
     Dim cancelMsg As String
     Dim datRange As dateRange
+    Dim itemCount As Integer
+    itemCount = 0
+    
     ' did user select date range or individual items?
     datRange = selectedDateRange()
+    
     If Application.ActiveExplorer.Selection.Count > 0 Then
         Set itemsToDelete = Application.ActiveExplorer.Selection
     ElseIf (datRange.startDate <> datRange.datNull) And (datRange.endDate <> datRange.datNull) Then
         ' auto-select all calendar items in range
         Set itemsToDelete = selectFromDateRange(datRange)
     End If
+    
     ' only proceed if items are selected by now, either automatically or manually
     If itemsToDelete.Count > 0 Then
-        ' What shall we send as message?
-        cancelMsg = InputBox(Prompt:="Your cancel message please. There will be no confirmation.", _
-              Title:="ENTER YOUR MESSAGE", Default:="I will be on vacation.")
-        If (cancelMsg <> "") Then
-            For Each oAppt In itemsToDelete
-                DeleteItemWithDefaultMessage oAppt, cancelMsg
-            Next oAppt
+        For Each oAppt In itemsToDelete
+            itemCount = itemCount + 1
+        Next oAppt
+        If (itemCount > 100) Then
+          MsgBox ("Too many entries. Max 100 are deleted in one go. Aborted!")
+        Else
+        ' Show found entries, get confirmation string
+            cancelMsg = InputBox(Prompt:="Selected Date Range: " & datRange.startDate & " - " & datRange.endDate & "." & Chr$(13) & Chr$(13) & "Number of found Items: " & itemCount _
+            & Chr$(13) & Chr$(13) & "Enter your cancel message below please. Check the info above, there will be no further confirmation.", _
+                  Title:="ENTER YOUR MESSAGE", Default:="I am on vacation.")
+            If (cancelMsg <> "") Then
+                For Each oAppt In itemsToDelete
+                    DeleteItemWithDefaultMessage oAppt, cancelMsg
+                Next oAppt
+            End If
         End If
     End If
 End Sub
@@ -103,17 +116,17 @@ Private Function selectFromDateRange(datRange As dateRange) As Outlook.Items
     Dim oReturnItems As Outlook.Items
     Dim oAppt As Outlook.AppointmentItem
     Dim strRestriction As String
-    strRestriction = "[Start] >= '" & (datRange.startDate) _
-        & "' AND [End] <= '" & (datRange.endDate) & "'"
+    strRestriction = "[Start] >= '" & (Format(datRange.startDate, "DDDDD HH:NN")) _
+        & "' AND [End] <= '" & (Format(datRange.endDate, "DDDDD HH:NN")) & "'"
     'Check the restriction string
     Debug.Print strRestriction
     Set oCalendar = Application.ActiveExplorer.CurrentFolder
     Set oItems = oCalendar.Items
     oItems.IncludeRecurrences = True
     oItems.Sort "[Start]"
-    'Restrict the Items collection for the 30-day date range
+    'Restrict the Items collection for the selected date range
     Set oItemsInDateRange = oItems.Restrict(strRestriction)
-    'Sort and Debug.Print final results
+    'Sort final results
     oItemsInDateRange.Sort "[Start]"
     If oItemsInDateRange.Count > 0 Then
         Set selectFromDateRange = oItemsInDateRange
@@ -126,20 +139,28 @@ Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
     Dim oAppointItem As Outlook.AppointmentItem
     Dim myMtg As Outlook.MeetingItem
     strMessageClass = oItem.MessageClass
-    If (strMessageClass = "IPM.Appointment") Then       ' Only operate on Calendar Entry.
+    If (InStr(1, strMessageClass, "IPM.Appointment") = 1) Then  ' Only operate on Calendar Entry.
         Set oAppointItem = oItem
-        If oAppointItem.Organizer = Outlook.Session.CurrentUser Then  ' If this is my own meeting
-            oAppointItem.MeetingStatus = olMeetingCanceled
-            oAppointItem.Body = cancelMsg
-            oAppointItem.Save
-            oAppointItem.Send
-        Else                                            ' If I was invited to this meeting
-            Set myMtg = oAppointItem.Respond(olMeetingDeclined, True, False)
-            If Not myMtg Is Nothing Then
+        Select Case oAppointItem.MeetingStatus
+          Case olNonMeeting                                     'Just a private meeting
+                'MsgBox ("Own Appointment, nobody invited: " + oAppointItem.Subject)
+                oAppointItem.Delete
+          Case olMeeting                                        'Own meeting (I am the invitor)
+                'MsgBox ("Own Appointment: " + oAppointItem.Subject)
+                oAppointItem.MeetingStatus = olMeetingCanceled
+                oAppointItem.Body = cancelMsg
+                oAppointItem.Save
+                oAppointItem.Send
+          Case olMeetingReceived                                'Received meeting invitation
+                'MsgBox ("Invited Appointment: " + oAppointItem.Subject)
+                Set myMtg = oAppointItem.Respond(olMeetingDeclined, True, False)
                 myMtg.Body = cancelMsg
                 myMtg.Send
-            End If
-        End If
+          Case olMeetingCanceled, olMeetingReceivedAndCanceled  'Received meeting invitation, updated afterwards
+                MsgBox ("Meeting has already been canceled, just trying to delete: " + oAppointItem.Subject)
+                oAppointItem.Delete
+          Case Else
+        End Select
     End If
 End Sub
 
