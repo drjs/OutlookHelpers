@@ -3,7 +3,7 @@ OutlookHelpers
 
 Scripts that automate tedious recurring tasks in Microsoft Outlook.
 
-Copyright (c) 2014 by Joachim Schlosser
+Copyright (c) 2014-2022 by Joachim Schlosser with major improvements by Klaus Jandl
 http://www.schlosser.info
 
 All rights reserved.
