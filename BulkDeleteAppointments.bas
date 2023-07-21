@@ -153,9 +153,6 @@ Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
                 oAppointItem.Send
           Case olMeetingReceived                                'Received meeting invitation
                 'MsgBox ("Invited Appointment: " + oAppointItem.Subject)
-                Debug.Print "Subject: " & oAppointItem.Subject
-                Debug.Print "Start Time: " & oAppointItem.Start
-                Debug.Print "End Time: " & oAppointItem.End
                 Set myMtg = oAppointItem.Respond(olMeetingDeclined, True, False)
                 If oAppointItem.ResponseRequested Then
                     myMtg.Body = cancelMsg
