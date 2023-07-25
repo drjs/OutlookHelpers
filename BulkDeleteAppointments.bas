@@ -54,7 +54,7 @@ Public Sub BulkDeleteAppointments()
     End If
     
     ' only proceed if items are selected by now, either automatically or manually
-    If itemsToDelete.Count > 0 Then
+    If Not itemsToDelete Is Nothing And itemsToDelete.Count > 0 Then
         For Each oAppt In itemsToDelete
             itemCount = itemCount + 1
         Next oAppt
@@ -62,7 +62,7 @@ Public Sub BulkDeleteAppointments()
           MsgBox ("Too many entries. Max 100 are deleted in one go. Aborted!")
         Else
         ' Show found entries, get confirmation string
-            cancelMsg = InputBox(Prompt:="Selected Date Range: " & datRange.startDate & " - " & datRange.endDate & "." & Chr$(13) & Chr$(13) & "Number of found Items: " & itemCount _
+            cancelMsg = InputBox(Prompt:="Selected Date Range: " & Format(datRange.startDate, "DDDDD HH:NN") & " - " & Format(datRange.endDate, "DDDDD HH:NN") & "." & Chr$(13) & Chr$(13) & "Number of found Items: " & itemCount _
             & Chr$(13) & Chr$(13) & "Enter your cancel message below please. Check the info above, there will be no further confirmation.", _
                   Title:="ENTER YOUR MESSAGE", Default:="I am on vacation.")
             If (cancelMsg <> "") Then
@@ -154,8 +154,10 @@ Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
           Case olMeetingReceived                                'Received meeting invitation
                 'MsgBox ("Invited Appointment: " + oAppointItem.Subject)
                 Set myMtg = oAppointItem.Respond(olMeetingDeclined, True, False)
-                myMtg.Body = cancelMsg
-                myMtg.Send
+                If oAppointItem.ResponseRequested Then
+                    myMtg.Body = cancelMsg
+                    myMtg.Send
+                End If
           Case olMeetingCanceled, olMeetingReceivedAndCanceled  'Received meeting invitation, updated afterwards
                 MsgBox ("Meeting has already been canceled, just trying to delete: " + oAppointItem.Subject)
                 oAppointItem.Delete
@@ -163,4 +165,3 @@ Sub DeleteItemWithDefaultMessage(oItem, cancelMsg)
         End Select
     End If
 End Sub
-
